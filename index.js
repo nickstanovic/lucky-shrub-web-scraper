@@ -1,73 +1,76 @@
 const { chromium } = require('playwright');
 
+// Function to scrape plant data from a given URL
+async function scrapePlantData(page, url) {
+    // Navigate to the provided URL
+    await page.goto(url);
 
-scrapeGreenPlants = async () => {
-    const browser = await chromium.launch({headless: false});
+    // Get the Brand
+    const brandElements = await page.$$('strong');
+    const brandTexts = [];
+    for (let i = 0; i < 5; i++) {
+        brandTexts.push(await brandElements[i].textContent());
+    }
+
+    // Get the Common Name
+    const commonNameElements = await page.$$('span.common-name');
+    const commonNameTexts = [];
+    for (let i = 0; i < 5; i++) {
+        commonNameTexts.push(await commonNameElements[i].textContent());
+    }
+
+    // Get the Genus
+    const genusElements = await page.$$('span.genus > em');
+    const genusTexts = [];
+    for (let i = 0; i < 5; i++) {
+        genusTexts.push(await genusElements[i].textContent());
+    }
+
+// Get the Species// Get the Species
+    const speciesElements = await page.$$('span.species > em');
+    const speciesTexts = [];
+    for (let i = 0; i < 5; i++) {
+        const speciesText = await speciesElements[i].textContent();
+        // Capitalize the first letter of the species text
+        const capitalizedSpeciesText = speciesText.charAt(0).toUpperCase() + speciesText.slice(1);
+        speciesTexts.push(capitalizedSpeciesText);
+    }
+
+    // Initialize an empty array to store the concatenated strings
+    const concatenatedStrings = [];
+
+    // Iterate through the first 5 elements of each array
+    for (let i = 0; i < 5; i++) {
+        // Concatenate the text contents and add them to the concatenatedStrings array
+        concatenatedStrings.push(`${brandTexts[i]} ${commonNameTexts[i]} ${genusTexts[i]} ${speciesTexts[i]}`);
+    }
+
+    // Return the concatenatedStrings array
+    return concatenatedStrings;
+}
+
+// Main function to handle browser initialization and scraping tasks
+async function main() {
+    // Launch a new browser with no headless mode so I can see what's happening
+    const browser = await chromium.launch({ headless: false });
     const page = await browser.newPage();
 
-    const greenPlantSite = 'https://www.provenwinners.com/plants/search/advanced?duration=Houseplant';
-    await page.goto(greenPlantSite);
-    await page.locator('#closeIconContainer').click();
+    const greenIndoorPlants = await scrapePlantData(page, 'https://www.provenwinners.com/plants/search/advanced?duration=Houseplant');
+    console.log("Green Indoor Plants:");
+    console.log(greenIndoorPlants);
 
-    const greenPlantNames = await page.evaluate(() => {
-        const greenPlantNames = [];
-        const elements = document.querySelectorAll('span.variety');
-        for (let i = 0; i < 5 && i < elements.length; i++) {
-            greenPlantNames.push(elements[i].textContent);
-        }
-        return greenPlantNames;
-    });
+    const redShrubs = await scrapePlantData(page, 'https://www.provenwinners.com/plants/search?hardiness_zone=All&duration=Shrub&flower-color=Red&light_requirement=All&available_online=All');
+    console.log("Red Shrubs:");
+    console.log(redShrubs);
 
-    console.log(greenPlantNames);
-    await page.waitForTimeout(15000)
+    const whiteShrubs = await scrapePlantData(page, 'https://www.provenwinners.com/plants/search?hardiness_zone=All&duration=Shrub&flower-color=White&light_requirement=All&available_online=All');
+    console.log("White Shrubs:");
+    console.log(whiteShrubs);
+
+
+// Close the browser
     await browser.close();
-};
+}
 
-scrapeRedShrubs = async () => {
-    const browser = await chromium.launch({headless: false});
-    const page = await browser.newPage();
-
-    const redShrubSite = 'https://www.provenwinners.com/plants/search?hardiness_zone=All&duration=Shrub&flower-color=Red&light_requirement=All&available_online=All';
-    await page.goto(redShrubSite);
-    await page.locator('#closeIconContainer').click();
-
-    const redShrubNames = await page.evaluate(() => {
-        const redShrubNames = [];
-        const elements = document.querySelectorAll('span.variety');
-        for (let i = 0; i < 5 && i < elements.length; i++) {
-            redShrubNames.push(elements[i].textContent);
-        }
-        return redShrubNames;
-    });
-
-    console.log(redShrubNames);
-    await page.waitForTimeout(15000)
-    await browser.close();
-};
-
-scrapeWhiteShrubs = async () => {
-    const browser = await chromium.launch({headless: false});
-    const page = await browser.newPage();
-
-    const whiteShrubSite = 'https://www.provenwinners.com/plants/search?hardiness_zone=All&duration=Shrub&flower-color=White&light_requirement=All&available_online=All';
-    await page.goto(whiteShrubSite);
-    await page.locator('#closeIconContainer').click();
-
-    const whiteShrubNames = await page.evaluate(() => {
-        const whiteShrubNames = [];
-        const elements = document.querySelectorAll('span.variety');
-        for (let i = 0; i < 5 && i < elements.length; i++) {
-            whiteShrubNames.push(elements[i].textContent);
-        }
-        return whiteShrubNames;
-    });
-
-    console.log(whiteShrubNames);
-    await page.waitForTimeout(15000)
-    await browser.close();
-};
-
-scrapeGreenPlants();
-scrapeRedShrubs();
-scrapeWhiteShrubs();
-
+// Call the main function to start the scraping process
+main();
