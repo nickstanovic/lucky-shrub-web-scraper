@@ -1,0 +1,1 @@
+Lucky Shrub Web Scraper was created using Playwright. The goal of the scraper is to help me gather plant images, names and descriptions for the Products webpage of a fictional company named Lucky Shrub.
