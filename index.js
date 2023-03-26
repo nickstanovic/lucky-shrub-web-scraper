@@ -52,7 +52,7 @@ async function scrapePlantData(page, url) {
 // Main function to handle browser initialization and scraping tasks
 async function main() {
     // Launch a new browser with no headless mode so I can see what's happening
-    const browser = await chromium.launch({ headless: false });
+    const browser = await chromium.launch();
     const page = await browser.newPage();
 
     const greenIndoorPlants = await scrapePlantData(page, 'https://www.provenwinners.com/plants/search/advanced?duration=Houseplant');
