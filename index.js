@@ -5,6 +5,13 @@ async function scrapePlantData(page, url) {
     // Navigate to the provided URL
     await page.goto(url);
 
+    // Get the Image URLs
+    const imageElements = await page.$$('div.field-item.odd > img');
+    const plantImages = [];
+    for (let i = 0; i < 5; i++) {
+        plantImages.push(await imageElements[i].getProperty('src'));
+    }
+
     // Get the Brand
     const brandElements = await page.$$('strong');
     const brandTexts = [];
@@ -42,7 +49,7 @@ async function scrapePlantData(page, url) {
     // Iterate through the first 5 elements of each array
     for (let i = 0; i < 5; i++) {
         // Concatenate the text contents and add them to the concatenatedStrings array
-        concatenatedStrings.push(`${brandTexts[i]} ${commonNameTexts[i]} ${genusTexts[i]} ${speciesTexts[i]}`);
+        concatenatedStrings.push(`${plantImages[i]} ${brandTexts[i]} ${commonNameTexts[i]} ${genusTexts[i]} ${speciesTexts[i]}`);
     }
 
     // Return the concatenatedStrings array
@@ -74,3 +81,4 @@ async function main() {
 
 // Call the main function to start the scraping process
 main();
+
