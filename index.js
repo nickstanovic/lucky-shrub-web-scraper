@@ -1,4 +1,8 @@
 const { chromium } = require('playwright');
+const request = require('request');
+const fs = require('fs');
+const path = require('path');
+
 
 // Function to scrape plant data from a given URL
 async function scrapePlantData(page, url) {
@@ -10,6 +14,15 @@ async function scrapePlantData(page, url) {
     const plantImages = [];
     for (let i = 0; i < 5; i++) {
         plantImages.push(await imageElements[i].getProperty('src'));
+    }
+
+    // Download the images to the specified location
+    const downloadDir = 'C:/Users/nicks/Downloads';
+    for (let i = 0; i < 5; i++) {
+        const imageUrl = await plantImages[i].jsonValue();
+        const imageFilename = path.basename(imageUrl);
+        const imagePath = path.join(downloadDir, imageFilename);
+        request(imageUrl).pipe(fs.createWriteStream(imagePath));
     }
 
     // Get the Brand
