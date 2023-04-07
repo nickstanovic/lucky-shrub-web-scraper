@@ -8,56 +8,26 @@ async function scrapePlantData(page, url) {
     await page.goto(url);
 
     const imageElements = await page.$$('div.field-item.odd > img');
-    const plantImages = [];
-    for (let i = 0; i < 5; i++) {
-        plantImages.push(await imageElements[i].getProperty('src'));
-    }
+    const plantImageUrls = [];
+    const plantImageAlts = [];
+    for (let i = 0; i < 4; i++) {
+        const src = await imageElements[i].getAttribute('src');
+        const alt = await imageElements[i].getAttribute('alt');
+        plantImageUrls.push(src);
+        plantImageAlts.push(alt)
 
-    const brandElements = await page.$$('strong');
-    const brandTexts = [];
-    for (let i = 0; i < 5; i++) {
-        brandTexts.push(await brandElements[i].textContent());
-    }
-
-    const commonNameElements = await page.$$('span.common-name');
-    const commonNameTexts = [];
-    for (let i = 0; i < 5; i++) {
-        commonNameTexts.push(await commonNameElements[i].textContent());
-    }
-
-    const genusElements = await page.$$('span.genus > em');
-    const genusTexts = [];
-    for (let i = 0; i < 5; i++) {
-        genusTexts.push(await genusElements[i].textContent());
-    }
-
-    const speciesElements = await page.$$('span.species > em');
-    const speciesTexts = [];
-    for (let i = 0; i < 5; i++) {
-        const speciesText = await speciesElements[i].textContent();
-        const capitalizedSpeciesText = speciesText.charAt(0).toUpperCase() + speciesText.slice(1);
-        speciesTexts.push(capitalizedSpeciesText);
+        // add a 7 second delay to scrape ethically
+        await new Promise(resolve => setTimeout(resolve, 7000));
     }
 
     const downloadDir = 'C:/Users/nicks/Downloads';
-    for (let i = 0; i < 5; i++) {
-        const imageUrl = await plantImages[i].jsonValue();
-        const brand = await brandTexts[i];
-        const commonName = await commonNameTexts[i];
-        const genus = await genusTexts[i];
-        const species = await speciesTexts[i];
-
-        const formattedFilename = `${brand}-${commonName}-${genus}-${species}.jpg`.split(' ').join('');
+    for (let i = 0; i < 4; i++) {
+        const imageUrl = plantImageUrls[i];
+        const imageAlt = plantImageAlts[i];
+        const formattedFilename = `${imageAlt}.jpg`.split('- ').join('');
         const imagePath = path.join(downloadDir, formattedFilename);
         request(imageUrl).pipe(fs.createWriteStream(imagePath));
     }
-
-    const concatenatedStrings = [];
-    for (let i = 0; i < 5; i++) {
-        concatenatedStrings.push(`${plantImages[i]} ${brandTexts[i]} ${commonNameTexts[i]} ${genusTexts[i]} ${speciesTexts[i]}`);
-    }
-
-    return concatenatedStrings;
 }
 
 async function main() {
@@ -76,11 +46,8 @@ async function main() {
     console.log("White Shrubs:");
     console.log(whiteShrubs);
 
-
-// Close the browser
     await browser.close();
 }
 
-// Call the main function to start the scraping process
 main();
 
