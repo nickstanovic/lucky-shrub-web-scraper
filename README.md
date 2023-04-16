@@ -14,7 +14,6 @@ Customizable and easy to use
 To get started with the Lucky Shrub Web Scraper, follow these simple steps:
 Clone the repository to your local machine.
 Install the necessary dependencies using npm install.
-Configure the scraper by editing the config.json file to specify the URL of the Lucky Shrub Products webpage and any other settings you want to customize.
 Run the scraper using 'node index.js'.
 The data will be printed to the console and the plant images will be saved to the downloads directory.
 
